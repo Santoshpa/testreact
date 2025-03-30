@@ -10,6 +10,22 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+  interface User {
+    id: number;
+    name: string;
+    email: string;
+    email_verified_at: string | null;
+    created_at: string | null;
+    updated_at: string | null;
+    user_role: string;
+    user_status: string;
+  }
+
+  interface ApiResponse {
+    token: string;
+    user: User;
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -31,21 +47,24 @@ export default function LoginPage() {
         body: JSON.stringify(loginData),
       });
 
+      // Parse the JSON body of the response
+      const data: ApiResponse = await response.json();
+
       // Check if the response is successful
       if (!response.ok) {
         // If login fails, display the error
-        const errorData = await response.json();
-        setError(errorData.message || "An error occurred during login.");
+        setError("An error occurred during login.");
         setLoading(false);
         return;
-      }
-
-      // If login is successful, redirect to the dashboard or home page
-      if (response.user.user_role === "admin") {
-        router.push("/dashboard");
       } else {
-        router.push("/user");
+        // If login is successful, redirect to the dashboard or home page
+        if (data.user.user_role === "admin") {
+          router.push("/dashboard");
+        } else {
+          router.push("/user");
+        }
       }
+      
     } catch (error) {
       console.log(error);
       setError("Network error occurred. Please try again.");
