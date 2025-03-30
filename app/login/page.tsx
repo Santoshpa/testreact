@@ -41,7 +41,11 @@ export default function LoginPage() {
       }
 
       // If login is successful, redirect to the dashboard or home page
-      router.push("/dashboard");
+      if (response.user.user_role === "admin") {
+        router.push("/dashboard");
+      } else {
+        router.push("/user");
+      }
     } catch (error) {
       console.log(error);
       setError("Network error occurred. Please try again.");
